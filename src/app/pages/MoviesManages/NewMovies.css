@@ -1,0 +1,28 @@
+ #custom-input-infor-author,
+ #custom-input-movie-name,
+ #custom-input-link-phim {
+     width: 500px;
+     height: 30px;
+ }
+ 
+ #custom-description-movie,
+ #custom-input-infor-character,
+ #custom-input-infor-author,
+ #custom-input-movie-name,
+ #custom-input-link-phim {
+     border-radius: 5px;
+ }
+  
+ #custom-description-movie{
+     height: 200px;
+  }
+ .label-in-new-movies {
+     padding-right: 30px;
+     width: 200px;
+ }
+ 
+ #btn-handle-submit {
+     background-color: #1890ff;
+     background: #1890ff;
+     color: #fff;
+ }

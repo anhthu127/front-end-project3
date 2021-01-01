@@ -1,0 +1,98 @@
+ 
+.MouseHover{
+     display: 'flex';
+}
+
+.MouseHover{
+  display: block;
+  text-align: right;
+  padding-right: 29px;
+  position: absolute;
+  width: 100%;
+  padding-top: -3px;
+}
+
+.beforeMouseHover{
+  display: none;
+  text-align: right;
+  padding-right: 29px;
+  position: absolute;
+  width: 100%;
+  padding-top: -3px;
+}
+
+.group-button-header {
+  padding-right: 80px !important;
+}
+
+.group-button {
+  display: none;
+  text-align: right;
+  padding-right: 29px;
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+}
+
+.panel-header-sections {
+  display: contents;
+  width: 100%;
+}
+
+.header-sections {
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.header-sections:hover ~ .group-button {
+  display: block;
+}​
+
+.hover-move-up{
+    border-radius: 5%;
+     background: #1890ff;
+    color: #000000;
+}
+
+.hover-move-down{
+      border-radius: 5%;
+    background: #1890ff;
+    color: #000000;
+}
+
+.hover-edit{
+     border-radius: 7%;
+    color: #000000;
+    background: #ffc107;
+}
+
+.hover-delete{
+     border-radius: 7%;
+    color: #000000;
+    background: #ff4107da;
+}
+
+.bg-section-edit {
+  background-color: #f8f9fa;
+  padding-bottom: 15px;
+}
+
+.panel-content-edit-section {
+  padding-bottom: 15px;
+}
+.isSelected{ 
+  display: block;
+}
+.beforeSelect {
+  display: none;
+}
+.survey-section{
+
+  border-radius: 5%;
+  background: #1890ff;
+  color: #000000;
+
+}
+ 
