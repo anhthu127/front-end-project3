@@ -3,15 +3,18 @@ import { Table } from 'reactstrap'
 import './ListCharacter.css'
 import { EditOutlined, DeleteOutlined, ProfileOutlined, SyncOutlined } from '@ant-design/icons';
 import MakeRequest from '../../Utils/MakeRequest';
+import { media_url } from '../../Utils/constants'
 import { Image } from 'antd';
 import { Modal, Pagination, Select, Spin } from "antd";
 import ModalSharing from '../SharingComponents/Modal';
 import { withRouter } from 'react-router-dom';
 import Search from 'antd/lib/input/Search';
+import Sort from '../../Utils/Sort';
+import ModalConfirm from '../../Utils/ModalConfirm';
+import { showErrorMessage, showSuccessMessage } from '../../Utils/notification';
 
 class ListChar extends React.Component {
     constructor(props) {
-
         super(props)
         this.state = {
             listData: [],
@@ -35,19 +38,19 @@ class ListChar extends React.Component {
             page: this.state.page,
             limit: this.state.limitInPage
         }
-        const res = await MakeRequest('GET', 'character/list', data)
-        if (res.data.signal === 1 && res.data.code === 200) {
+        const res = await MakeRequest('GET', 'character/all', data)
+        if (res.data.signal === 1) {
             await this.setState({
                 ... this.state,
-                listData: res.data.data.ListCharacter,
-                total: res.data.data.total,
+                listData: res.data.data.data,
+                total: res.data.data.pagination.totalRecord,
             })
         } else {
         }
     }
     modalContent = async (idCharater) => {
         const data = { characterId: idCharater }
-        const listUniMovies = await MakeRequest('GET', 'uniMovies/list', data)
+        const listUniMovies = await MakeRequest('GET', 'uniMovies/all', data)
         console.log("listUni  ", listUniMovies);
         return (
             <div>
@@ -61,6 +64,17 @@ class ListChar extends React.Component {
                 modalTitle={this.state.propsToModal.modalTitle}
                 modalContent={this.modalContent(idCharater)} />
         )
+    }
+    handleDelete = async (value) => {
+        console.log(value);
+        const res = await MakeRequest("DELETE", "character/" + value.id)
+        if (res.data.signal === 1) {
+            showSuccessMessage("Xóa thành công")
+
+            await this.getList()
+        } else {
+            showErrorMessage("Xóa thất bại do " + res.data.message)
+        }
     }
     onChange = async (page) => {
         console.log(page);
@@ -81,52 +95,48 @@ class ListChar extends React.Component {
                     <tr key={index}>
                         <th scope="row">{index + 1}</th>
                         <td>{value.name}</td>
-                        <td>{value.gender}</td>
-                        <td>{value.dOb}</td>
+                        <td>{value.gender === 0 ? ("nữ") : ("nam")}</td>
+                        <td>{value.dob}</td>
                         <td>
-                            {value.born_in}
+                            {value.address}
                         </td>
                         <td >
-                            <Image height={100} src={value.image} />
+                            <Image width={75} src={media_url + value.image} />
                         </td>
                         <td>
-                            {/* <ProfileOutlined style={{ fontSize: '25px', color: 'blueviolet' }}
-                                onClick={() => this.detailUniMovies(value.id)} /> */}
-                            <ModalSharing></ModalSharing>
+
+                            <ModalSharing item={value} page={this.state.page}
+                            updateListCharacter={(data, pagination) => {
+                                this.updateListCharacter(data, pagination) 
+                            }}></ModalSharing>
                             <EditOutlined />
-                            <DeleteOutlined />
+                            <ModalConfirm value={value}
+                                message="Bạn có chắc xóa diễn viên này?"
+                                handleOk={(value) => {
+                                    this.handleDelete(value)
+                                }}
+                            />
                         </td >
                     </tr >)
             })
             return show;
         }
     }
-    onSearch = async (value) => {
+    updateListCharacter = async (data, pagination) => {
+        console.log(JSON.stringify(data) + "==>" + JSON.stringify(pagination));
         await this.setState({
             ...this.state,
-            // page: 1,
-            dataSearch: value
+            listData: data,
+            total: pagination.totalRecord
         })
-        const dataSearch = {
-            dataSearch: value,
-            page: this.state.page,
-            limit: this.state.limitInPage
-        }
-        const res = await MakeRequest('GET', '/character/search', dataSearch)
-        await this.setState({
-            ...this.state,
-            listData: (res.data.data.rows) ? (res.data.data.rows) : (''),
-            total: res.data.data.count
-        })
-    };
+
+    }
     render() {
         return (
             <div>
-                <Search
-                    placeholder="Tìm kiếm"
-                    size="large"
-                    onSearch={(value) => this.onSearch(value)}
-                />
+                <Sort data={''} page={this.state.page} updateListCharacter={(data, pagination) => {
+                    this.updateListCharacter(data, pagination)
+                }} />
                 <br />
                 <Table>
                     <tr>

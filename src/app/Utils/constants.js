@@ -1,15 +1,11 @@
-export const api_url = "http://localhost:8081/"
+// export const api_url = "http://localhost:8081/"
+// export const media_url = "http://localhost:8081/"
+export const api_url = "http://phuquytuan123.com:3110/"
+export const media_url = "http://phuquytuan123.com:3110/"
+
 export const rootImage = "D://Project3/dating_with_my_dog/media/assets/"
 
-export const instagram = {
-   clientId: "346189446612906",
-   //  redirectUri:'https://cloneinsta-398a2.firebaseapp.com/',
-   // redirectUri: 'https://a052bf489711.ngrok.io/home',
-   redirectUri: 'https://google.com/',
-   responseType: 'code',
-   scope: ['user_profile', 'user_media']
 
-}
 
 export const gender = {
    1: "Nam",

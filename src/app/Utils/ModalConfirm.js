@@ -8,7 +8,7 @@ import { showErrorMessage, showSuccessMessage } from './notification';
 import MakeRequest from './MakeRequest';
 import { Button } from 'react-bootstrap';
 function ModalConfirm(props) {
-
+    const { message } = props
     const [visible, setVisible] = useState(false)
 
     const showModal = () => {
@@ -39,7 +39,7 @@ function ModalConfirm(props) {
                 cancelText="Hủy"
                 okText="Xóa"
             >
-                <p style={{ fontSize: '15px', fontWeight: 500 }}>Bạn có chắc chắn muốn xóa diễn viên này?</p>
+                <p style={{ fontSize: '15px', fontWeight: 500 }}>{message}</p>
             </Modal>
         </>
     );

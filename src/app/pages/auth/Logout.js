@@ -6,7 +6,7 @@ import { LayoutSplashScreen } from "../../../_metronic";
 
 class Logout extends Component {
   componentDidMount() {
-    this.props.logout();
+    const res = this.props.logout();
   }
 
   render() {
@@ -17,6 +17,7 @@ class Logout extends Component {
 }
 
 export default connect(
-  ({ auth }) => ({ hasAuthToken: Boolean(auth.authToken) }),
+  ({ auth }) => ({ hasAuthToken: Boolean(auth.authToken) },
+    console.log(auth.authToken)),
   auth.actions
 )(Logout);

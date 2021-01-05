@@ -14,6 +14,7 @@ import './NewMovies.css'
 import { showErrorMessage, showSuccessMessage } from '../../Utils/notification'
 import { forEach } from 'lodash'
 import AddMoreCharacter from './addMoreCharacter'
+import MakeRequest from '../../Utils/MakeRequest'
 
 
 export default function NewMovies() {
@@ -88,20 +89,45 @@ export default function NewMovies() {
         console.log("movieInfor: " + JSON.stringify(movieInfo));
         let dataPost = new FormData();
         dataPost.append('file', file);
-        dataPost.append("nameMovie", movieInfo.nameMovie);
-        dataPost.append("description", movieInfo.description);
-        dataPost.append("author", movieInfo.author);
-        dataPost.append("linkMovie", movieInfo.linkMovie);
-        dataPost.append("listCharacter", movieInfo.listCharacter);
-        console.log(movieInfo.listCharacter);
-        if (movieInfo.nameMovie.length < 3 || movieInfo.description.length < 3 || movieInfo.linkMovie.length < 3
-            || movieInfo.author.length < 3 || movieInfo.category.length < 1) {
-            showErrorMessage("Điền đầy đủ thông tin")
-            setTimeout(() => {
+        let image = null
+        image = await saveImage(dataPost)
+        if (image.data.signal === 1) {
+            if (movieInfo.nameMovie.length < 3 || movieInfo.description.length < 3 || movieInfo.linkMovie.length < 3
+                || movieInfo.author.length < 3
+                // || movieInfo.category.length < 1
+            ) {
+                const dataMovie = {
+                    id: movieInfo.id,
+                    name: movieInfo.name,
+                    description: movieInfo.description,
+                    derectorId: movieInfo.derectorId,
+                    image: image.data.imagePath
+                }
+                console.log(dataMovie);
+                showErrorMessage("Điền đầy đủ thông tin")
+                setTimeout(() => {
+                    setLoading(false)
+                }, 500)
+            } else {
+
+            }
+        }
+        const saveImage = async (dataPost) => {
+            const res = await MakeRequest('post', `upload/photo`, dataPost
+                , {
+                    'Content-Type': 'multipart/form-data'
+                }
+            )
+            if (res.data && res.data.signal === 1) {
+                return res.data
+
+            } else {
+                showErrorMessage('Tạo thất bạii')
                 setLoading(false)
-            }, 500)
-        } else {
-            const addResponse = await makeRequest('POST', 'movies/add', dataPost
+            }
+        }
+        const saveMovie = async (dataPost) => {
+            const addResponse = await makeRequest('post', 'movies/create', dataPost
                 , {
                     'Content-Type': 'multipart/form-data'
                 })
@@ -181,7 +207,7 @@ export default function NewMovies() {
                     </div>
                     <div style={{ width: '20px' }}></div>
                     <div className='image_preview' style={{
-                        float: 'right', width: '300px', height: '200px',
+                        float: 'right', width: '200px', height: '200px',
                         marginRight: '100px', display: 'flex', border: '1px solid #e1e1ef'
                     }} >
                         {file != '' &&
@@ -193,25 +219,27 @@ export default function NewMovies() {
                             )}
                     </div>
                 </FormGroup>
+                {/*                 
                 <FormGroup className="wrap-unique-movies-box">
                     <label className="label-in-new-movies" >Danh sách diễn viên</label>
                     <Selector placeholder="Chọn danh sách diễn viên" data={listCharacter} multiple="multiple"
                         name='category' getData={(value) => getCharacter(value)} />
                     <AddMoreCharacter />
-                </FormGroup>
+                </FormGroup> */}
 
 
                 <FormGroup className="">
                     <label className="label-in-new-movies"> Đạo diễn</label>
                     <Input name='author' id="custom-input-infor-author" value={movieInfo.author} onChange={handleChange} ></Input>
                 </FormGroup>
-
+                {/* 
                 <FormGroup className="wrap-movies-category">
                     <label className="label-in-new-movies"> Thể loại </label>
                     <Selector placeholder="Chọn thể loại phim" data={categories} multiple="multiple"
                         name='category' getData={(value) => getCategory(value)}
                     />
                 </FormGroup>
+            */}
             </FormGroup>
             <div>
 

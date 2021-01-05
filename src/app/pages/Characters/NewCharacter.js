@@ -1,7 +1,6 @@
 import { AddCircleOutline, PowerOffOutlined, RemoveCircleOutline } from '@material-ui/icons';
 import { Button, DatePicker, Image, Input, Radio } from 'antd'
-import { setDate } from 'date-fns';
-import { set } from 'lodash';
+
 import moment from 'moment';
 import React, { useEffect, useState } from 'react'
 import { Form, FormGroup, FormText } from 'reactstrap';
@@ -17,39 +16,43 @@ export default function NewCharater() {
         dOb: '',
         bornIn: '',
         height: '',
-        description: ''
+        description: '',
     })
-    const [uniMovies, setUniMovies] = useState([
-        { placeholder: "Nhập tên phim", unique: 'abcdefgh', name: '' },
-        { placeholder: "Nhập tên phim", unique: 'nmdjaksh', name: '' }
 
-    ])
     const [clear, setClear] = useState(false)
     const [listUniDel, setListUniDel] = useState([])
     const [file, setFile] = useState('')
     const [gender, setGender] = useState(1)
     const [pathFile, setPath] = useState('')
+    const [imageSaved, setImgaeSaved] = useState('')
     const [isLoading, setLoading] = useState(false)
     const { TextArea } = Input;
     const [id, setID] = useState('')
     const clearState = () => {
         setInfo({
             name: '',
-            dOb: '',
             bornIn: '',
             height: '',
-            description: ''
+            description: '',
         })
-        setUniMovies([
-            { placeholder: "Nhập tên phim", unique: 'abcdefgh', name: '' },
-            { placeholder: "Nhập tên phim", unique: 'nmdjaksh', name: '' },
-        ])
+
         setFile('')
         setGender('')
         setPath('')
         setLoading(false)
 
     }
+    const preview = () => {
+        let show = (file.name) ?
+            (
+                <>
+                    <Image height={200} src={pathFile} />
+                    <Button onClick={(e) => clearFile()}>x</Button>
+                </>
+            ) : ('')
+        return show
+    }
+    useEffect(() => { preview() }, [file])
     useEffect(() => {
         clearState()
         setClear(false)
@@ -57,64 +60,62 @@ export default function NewCharater() {
     const submitButton = async () => {
         setLoading(true)
         let dataPost = new FormData();
-        dataPost.append('file', file);
-        dataPost.append('name', characterInfo.name)
-        dataPost.append('dOb', characterInfo.dOb)
-        dataPost.append("gender", gender)
-        dataPost.append("height", characterInfo.height)
-        dataPost.append("bornIn", characterInfo.bornIn)
-        dataPost.append("description", characterInfo.description)
-        dataPost.append("uniMovies", uniMovies)
-        if (characterInfo.name.length > 0 && characterInfo.dOb.length > 0 && (characterInfo.height > 70 || characterInfo.height)
-            && pathFile.length > 0 && characterInfo.bornIn.length > 0) {
-            const res = await saveCharacter(dataPost)
-            let movieSaved
-            console.log(res);
-            if (res.data && res.data.signal === 0) {
-                showSuccessMessage("" + res.data.data.message)
+        dataPost.append('image', file);
+        const image = await saveImage(dataPost)
+        console.log(characterInfo);
+
+
+        if (image && image.signal === 1) {
+            const dataCharacter = {
+                id: characterInfo.id,
+                name: characterInfo.name,
+                dob: characterInfo.dOb,
+                description: characterInfo.description,
+                address: characterInfo.bornIn,
+                gender: gender,
+                image: image.data.imagePath
             }
-            if (res) {
-                // setID(res.data.data.id)
-                movieSaved = await saveUniMovies(res.data.data.id)
-            }
-            if (res && res.data && res.data.signal === 1 && movieSaved.data.signal === 1) {
-                setLoading(false)
-                setClear(true)
-                showSuccessMessage('Tạo thành công')
+            const character = await saveCharacter(dataCharacter)
+            if (character && character.signal === 1) {
+                showSuccessMessage("Tạo diễn viên thành công")
             } else {
-                setLoading(false)
-                // setClear(true)
-                showSuccessMessage('Tạo thất bại' + res.data.data.message)
+                showErrorMessage("Tạo diễn viên thất bại")
             }
         } else {
-            showErrorMessage('Điền đầy đủ thông tin')
-            setLoading(false)
+            showErrorMessage("Không tải được ảnh")
         }
+
     }
-    const saveCharacter = async (dataPost) => {
-        const res = await MakeRequest('post', `character/add`, dataPost
+    useEffect(() => {
+         console.log(characterInfo);
+    }, [characterInfo])
+    const saveImage = async (dataPost) => {
+        const res = await MakeRequest('post', `upload/photo`, dataPost
             , {
                 'Content-Type': 'multipart/form-data'
             }
         )
-        if (res.data && res.data.signal === 1 && res.data.code === 200) {
-            return res
+        if (res.data && res.data.signal === 1) {
+            setImgaeSaved(res.data.data)
+            return res.data
 
         } else {
             showErrorMessage('Tạo thất bạii')
             setLoading(false)
         }
     }
-    const saveUniMovies = async (characterId) => {
-        console.log("character id: " + characterId);
-        const uniMovieInfo = {
-            character_id: characterId,
-            uniMovies: uniMovies
+    const saveCharacter = async (dataPost) => {
+        const res = await MakeRequest('post', `character/create`, dataPost
+
+        )
+        if (res.data && res.data.signal === 1) {
+            return res.data
+        } else {
+            showErrorMessage('Tạo thất bạii')
+            setLoading(false)
         }
-        const res = await MakeRequest('post', 'uniMovies/saveByCharacterId', uniMovieInfo)
-        // console.log("moviesaved   ", res);
-        return res
     }
+
 
     const handleChange = (e) => {
         e.preventDefault();
@@ -124,36 +125,7 @@ export default function NewCharater() {
             [name]: value,
         })
     }
-    const removeUniMovie = (e, index) => {
-        e.preventDefault();
-        let data = [...uniMovies];
-        if (data[index].id) {
-            let movieDel = [...listUniDel];
-            movieDel.push(data[index].id);
-            setListUniDel(movieDel);
-        }
-        let datafilter = data.filter((_item, key) => {
-            if (key !== index) {
-                return true;
-            }
-            return false;
-        });
-        setUniMovies(datafilter);
-    };
-    const handleUniMovie = (e, index) => {
-        e = window.event || e;
-        e.preventDefault();
-        let movies = [...uniMovies];
-        movies[index].name = e.target.value;
-        setUniMovies(movies);
-    }
-    const addMoreUniMovie = (e) => {
-        let placeholder = "Nhập tên phim";
-        let unique = generateRandomCode(6);
-        let data = [...uniMovies];
-        data.push({ placeholder, unique });
-        setUniMovies(data);
-    }
+
     const onChangeDate = (date) => {
         if (date) {
             let dateConvert = new Date(date).toUTCString();
@@ -207,13 +179,7 @@ export default function NewCharater() {
                             float: 'right', width: '300px', height: '200px',
                             marginRight: '100px', display: 'flex', border: '1px solid #e1e1ef'
                         }} >
-                            {file != '' &&
-                                (
-                                    <>
-                                        <Image height={200} src={pathFile} />
-                                        <Button onClick={(e) => clearFile()}>x</Button>
-                                    </>
-                                )}
+                            {preview()}
                         </div>
                     </FormGroup>
                     <FormGroup className="wrap-gender-box">
@@ -240,12 +206,12 @@ export default function NewCharater() {
                         />
                     </FormGroup>
 
-                    <FormGroup className="wrap-height-box">
+                    {/* <FormGroup className="wrap-height-box">
                         <label className='label-in-character' >Chiều cao</label>
                         <Input id="custom-input-height" value={characterInfo.height} name="height" onChange={handleChange}></Input>
                         <label style={{ paddingLeft: '30px' }}>(cm)</label>
 
-                    </FormGroup>
+                    </FormGroup> */}
                     <FormGroup className="wrap-description-box">
                         <p className='label-in-character' >Tiểu sử</p>
                         <TextArea
@@ -256,37 +222,13 @@ export default function NewCharater() {
                             onChange={handleChange}>
                         </TextArea>
                     </FormGroup>
-                    <FormGroup className="wrap-unique-movies-box">
-                        <p className='label-uniMovies-in-character' >Danh sách phim tiêu biểu</p>
-                        <div >
-                            {uniMovies.map((item, idx) => {
-                                return (
-                                    <div style={{ display: 'flex', paddingBottom: '10px' }}>
-                                        <Input id="custom-input-uniMovie" name="uniMovies"
-                                            placeholder={item.placeholder}
-                                            value={item.name}
-                                            onChange={(event) => handleUniMovie(event, idx)} />
-                                        <div style={{ paddingLeft: '30px' }}>  <AddCircleOutline
-                                            style={{ cursor: "pointer" }}
-                                            onClick={() => addMoreUniMovie()}
-                                        />
-                                            {uniMovies.length > 1 && (
-                                                <RemoveCircleOutline
-                                                    style={{ cursor: "pointer" }}
-                                                    onClick={(e) => removeUniMovie(e, idx)}
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </FormGroup>
                     {isLoading ?
                         <Button type="primary" loading>Thêm mới diễn viên</Button> :
                         <Button type="primary" onClick={() => submitButton()}>Thêm mới diễn viên</Button>}
 
+
                 </FormGroup>
+
             </Form>
         </div >
     )

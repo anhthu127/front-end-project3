@@ -26,13 +26,13 @@ export const reducer = persistReducer(
     switch (action.type) {
       case actionTypes.Login: {
         const { authToken } = action.payload;
-
+        console.log(authToken);
+        localStorage.setItem("token", authToken)
         return { authToken, user: undefined, userRole: undefined };
       }
 
       case actionTypes.ForgotPassword: {
         const { authToken } = action.payload;
-
         return { authToken, user: undefined, userRole: undefined };
       }
 
@@ -47,14 +47,17 @@ export const reducer = persistReducer(
 
         return { authToken, user: undefined, userRole: undefined };
       }
-
       case actionTypes.Logout: {
+        console.log(state.authToken);
         routerHelpers.forgotLastLocation();
+        console.log(initialAuthState);
         return initialAuthState;
       }
 
       case actionTypes.UserLoaded: {
         const { user, userRole } = action.payload;
+        // localStorage.setItem("token", user.token)
+        console.log(action.payload);
         return { ...state, user, userRole };
       }
 
@@ -94,7 +97,7 @@ export function* saga() {
         role: "admin"
       }
     }
-    yield put(actions.fulfillUser(user.data));
+    yield put(actions.fulfillUser(user.data, user.data.role));
     // } else {
     // yield put(actions.logout());
     // }

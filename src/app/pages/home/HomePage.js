@@ -2,15 +2,14 @@
 import React, { Suspense, lazy } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import { LayoutSplashScreen } from "../../../_metronic";
-import ListCharacter from "../Characters/ListCharacter";
-import ListChar from "../Characters/List";
+ import ListChar from "../Characters/List";
 import NewCharater from "../Characters/NewCharacter";
+import Season from "../MoviesManages/Season";
 
 {
 	/* =============Dashboard============= */
 }
 const Dashboard = lazy(() => import("../dashboard/Dashboard"));
-
 const ListMovies = lazy(() => import('../MoviesManages/ListMovies'))
 const NewMovies = lazy(() => import('../MoviesManages/NewMovie'))
 {
@@ -28,21 +27,12 @@ export default function HomePage() {
 				{
 					/* Redirect from root URL to /dashboard. */
 					<Redirect exact from="/" to="/dashboard" />
-
 				}
-				{
-					<Redirect exact from="/logout" to="/" />
-				}
-				<Route path="/admin/movies_list" component={ListMovies} />
-				<Route path="/admin/movies_add" exact component={NewMovies} />
-
-				<Route path="/admin/add_character" exact component={NewCharater} />
-				<Route path="/admin/list_character" exact component={ListChar} />
-
-
-
-
-
+				<Route path="/admin/movie/list" component={ListMovies} />
+				<Route path="/admin/movie/add" exact component={NewMovies} />
+				<Route   path="/admin/character/add" component={NewCharater} />
+				<Route exact path="/admin/movie/season" component={Season} />
+				<Route path="/admin/character/list" exact component={ListChar} />
 				{/* Route questions */}
 				{/* <Route path="/survey-sections/add" exact component={AddSurveySection} />
 				<Route

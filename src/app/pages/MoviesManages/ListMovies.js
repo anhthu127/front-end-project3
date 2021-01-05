@@ -179,6 +179,7 @@ export default function ListMovies() {
                                                 onClick={() => { handleEdit() }}
                                             /> */}
                                             <ModalConfirm value={value}
+                                                message="Bạn có chắc muốn xóa phim này?"
                                                 handleOk={(value) => {
                                                     handleDelete(value)
                                                 }}
