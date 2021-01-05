@@ -9,8 +9,8 @@ export const CONFIRM_FORGOT_PASSWORD = "auth/confirmForgotPassword"
 
 export const ME_URL = "auth/getInfo";
 
-export function login(email, password) {
-  return axios.post(URL_API + LOGIN_URL, { email, password });
+export function login(data) {
+  return axios.post(URL_API + LOGIN_URL, data);
 }
 export function forgotPassword(email, hostFront) {
   return axios.post(URL_API + FORGOT_PASSWORD_URL, { email, hostFront });

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import makeRequest from '../../Utils/MakeRequest';
-import { Table } from 'reactstrap'
+import { Table, Input, Button, FormGroup } from 'reactstrap'
 import Selector from '../../Utils/Selector'
 // import ReactPlayer from 'react-player'
 import { Pagination } from 'antd';
@@ -12,7 +12,7 @@ import { showErrorMessage, showSuccessMessage, showSuccessMessageIcon } from '..
 import ModalDetail from './ModalDetail';
 export default function ListMovies() {
 
-    const [category, setCategory] = useState('');
+    const [category, setCategory] = useState([]);
     const [listMovie, setListMovie] = useState([]);
     const [dataSearch, setData] = useState();
     const [searchCategories, setSearchCategories] = useState();
@@ -43,7 +43,12 @@ export default function ListMovies() {
         }
     }
     const getData = async (value) => {
-        const res = await makeRequest('POST', 'movies/listByCategory', value)
+        const data = {
+            page: page,
+            limit: 10,
+            code: value
+        }
+        const res = await makeRequest('get', 'movies/listByCategory/', data)
         console.log(res.data);
     }
     const editMovie = async (value) => {
@@ -51,7 +56,7 @@ export default function ListMovies() {
         if (res.data.signal === 1) {
             showSuccessMessage("Cập nhật thành công")
             getList()
-        }else{
+        } else {
             showErrorMessage("Cập nhật thất bại")
         }
     }
@@ -69,6 +74,12 @@ export default function ListMovies() {
             setListMovie(data.rows)
         }
     };
+    const handleSort = (e) => {
+        const code = e.target.value
+        getData(code)
+
+    }
+
     const handleDetails = () => {
 
     }
@@ -94,9 +105,37 @@ export default function ListMovies() {
     }
     return (
         <div classNa="movies_home" >
-            <div style={{ paddingTop: '20px', paddingBottom: '20px', float: 'left' }}>
-                <Selector data={category} placeholder="Chọn loại phim" multiple="multiple"
-                    name='category' getData={(value) => getData(value)} />
+            <div style={{ paddingBottom: '20px', float: 'left' }}>
+                <div style={{ display: 'flex', paddingTop: '20px' }}>
+                    <FormGroup style={{ display: 'flex', alignSelf: 'center', paddingRight: '200px', paddingLeft: '100px', margin: '0px' }}>
+                        <Input
+                            style={{ width: '500px' }}
+                            type="search"
+                            name="dataSearch"
+                            id="exampleSearch"
+                            placeholder="Tìm kiếm"
+                            onChange={(e) => {
+                                // this.handleSearch(e)
+                            }}
+                        />
+                        <Button>
+                            <i class="fas fa-search"></i></Button>
+                    </FormGroup>
+                    <FormGroup style={{ margin: '0px' }}>
+                        <Input type="select" name="select" id="exampleSelect" onChange={(e) => {
+                            handleSort(e)
+                        }}>
+                            <option name="default" value="default">Lọc thể loại phim</option>
+                            {
+                                category.map((item, index) => {
+                                    return (
+                                        <option name="price" value={item.code}>{item.name}</option>
+                                    )
+                                })
+                            }                        </Input>
+                    </FormGroup>
+
+                </div>
             </div>
             <br />
             <div>

@@ -28,6 +28,10 @@ export default function HomePage() {
 				{
 					/* Redirect from root URL to /dashboard. */
 					<Redirect exact from="/" to="/dashboard" />
+
+				}
+				{
+					<Redirect exact from="/logout" to="/" />
 				}
 				<Route path="/admin/movies_list" component={ListMovies} />
 				<Route path="/admin/movies_add" exact component={NewMovies} />
@@ -36,18 +40,8 @@ export default function HomePage() {
 				<Route path="/admin/list_character" exact component={ListChar} />
 
 
-				{/* Route organizations */}
-				{/* <Route path="/organizations/list" component={ListOrganization} />
- 				<Route path="/answer/list" component={ListAnswers} />
- 				<Route path="/surveyround/add" exact component={AddEditSurveyRounds} />
-				<Route path="/surveyround/update/:id" component={AddEditSurveyRounds} />
 
- 
-				<Route path="/surveyroundorg/list" component={ListSurveyRoundsOrg} /> */}
 
-				{/* <Route path="/questions/add" exact component={AddQuestion} />
-				<Route path="/questions/update/:id" component={EditQuestion} />
-				<Route path="/questions/list" component={ListQuestion} /> */}
 
 				{/* Route questions */}
 				{/* <Route path="/survey-sections/add" exact component={AddSurveySection} />

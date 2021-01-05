@@ -87,7 +87,7 @@ class ListChar extends React.Component {
                             {value.born_in}
                         </td>
                         <td >
-                            <Image height={200} src={value.image} />
+                            <Image height={100} src={value.image} />
                         </td>
                         <td>
                             {/* <ProfileOutlined style={{ fontSize: '25px', color: 'blueviolet' }}

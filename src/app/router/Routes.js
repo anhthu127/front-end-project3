@@ -15,6 +15,7 @@ import ErrorsPage from "../pages/errors/ErrorsPage";
 import { LayoutContextProvider } from "../../_metronic";
 import Layout from "../../_metronic/layout/Layout";
 import * as routerHelpers from "../router/RouterHelpers";
+import LogoutPage from "../pages/auth/Logout";
 import AuthPage from "../pages/auth/AuthPage";
 import 'antd/dist/antd.css';
 import test from "../test/test";
@@ -36,7 +37,33 @@ export const Routes = withRouter(({ history }) => {
   return (
     /* Create `LayoutContext` from current `history` and `menuConfig`. */
     <LayoutContextProvider history={history} menuConfig={menuConfig}>
-      <Switch> 
+      <Switch>
+
+        {
+          !isAuthorized ? (
+            <AuthPage />
+          ) : (
+              /* Otherwise redirect to root page (`/`) */
+              <Redirect from="/auth" to={userLastLocation} />
+            )
+        }
+
+        <Route path="/error" component={ErrorsPage} />
+
+
+        <Route path="/logout" component={LogoutPage} />
+
+        {
+          !isAuthorized ? (
+            /* Redirect to `/auth` when user is not authorized */
+            <Redirect to="/auth/login" />
+          ) : (
+
+              <Layout>
+                <HomePage userLastLocation={userLastLocation} />
+              </Layout>
+            )
+        }
         <Route path='/test' component={test} />
         <Layout>
           <HomePage userLastLocation={userLastLocation} />
@@ -46,25 +73,3 @@ export const Routes = withRouter(({ history }) => {
     </LayoutContextProvider>
   );
 });
-
-// {!isAuthorized ? (
-//   <AuthPage />
-// ) : (
-//     /* Otherwise redirect to root page (`/`) */
-//     <Redirect from="/auth" to={userLastLocation} />
-//   )}
-
-// <Route path="/error" component={ErrorsPage} />
-
-
-// {/* <Route path="/logout" component={LogoutPage} /> */ }
-
-// {!isAuthorized ? (
-//   /* Redirect to `/auth` when user is not authorized */
-//   <Redirect to="/auth/login" />
-// ) : (
-
-//     <Layout>
-//       <HomePage userLastLocation={userLastLocation} />
-//     </Layout>
-//   )}

@@ -33,7 +33,7 @@ function Error403() {
             </div>
         </div>
         <div id="footer" className={classes1.footer}>
-            © Bản quyền thuộc về Survey
+            © Bản quyền thuộc về T_PHIM
         </div>
     </div>
 }

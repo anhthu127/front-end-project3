@@ -96,7 +96,7 @@ function AddMoreCharacter() {
         dataPost.append("description", characterInfo.description)
         if (characterInfo.name.length > 0 && characterInfo.dOb.length > 0 && (characterInfo.height > 70 || characterInfo.height)
             && pathFileModal.length > 0 && characterInfo.bornIn.length > 0) {
-            const res = await MakeRequest('post', `character/add`, dataPost
+            const res = await MakeRequest('post', `character/create`, dataPost
                 , {
                     'Content-Type': 'multipart/form-data'
                 }

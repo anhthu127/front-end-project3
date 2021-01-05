@@ -15,7 +15,7 @@ function Login(props) {
   const [isLogined, setIsLogined] = useState(false);
 
   if (isLogined) {
-    return <Redirect to="/" />;
+    return <Redirect to="/dashboard" />;
   }
 
   const togglePasswordVisibility = () => {
@@ -40,8 +40,11 @@ function Login(props) {
       return showErrorMessage('Vui lòng nhập mật khẩu');
     }
     setIsSubmitting(true);
-
-    login(email, password)
+    const data = {
+      username: email,
+      password: password
+    }
+    login(data)
       .then(({ data }) => {
         if (data.signal) {
           setIsSubmitting(false);
@@ -68,18 +71,21 @@ function Login(props) {
               <div className="tn-row">
                 <div className="custom-left">
                   <div className="bxinfo">
-                    <h1 className="titu">VIỆN PHÁT TRIỂN KINH TẾ HỢP TÁC</h1>
-                    <div> Địa chỉ: Tòa nhà Liên minh Hợp tác xã Việt Nam, Đường Dương Đình Nghệ, Yên Hòa, Cầu GIấy, Hà Nội </div>
-                    <div> <span>Điện thoại:  024 62693396</span> <span>Fax: 024 6281262</span> <span>Email: vanphong@iced.vn</span> </div>
+                    <h1 className="titu">Hệ thống Quản lý T_Phim</h1>
+                    <div>  </div>
+                    <div > <span>Điện thoại:  0926 866 559           </span>
+                      <span style={{paddingLeft:'40px'}}>Email: anhthu127at@gmail.com</span> </div>
+                    <div>  <span>Địa chỉ: Số 1 Đại Cồ Việt Hai Bà Trưng Hà Nội</span> </div>
+
                   </div>
                 </div>
                 <div className="custom-right">
                   <div className="bxform">
                     <div className="logolg">
                       <div className="tn-logo">
-                        <img className="tn-logo__image" src={require('../../../_metronic/_assets/media/image/logo-tri-nam.png')} alt="" title="" />
+                        <img className="tn-logo__image" src={require('../../../_metronic/_assets/media/image/logo.jpg')} alt="" title="" />
                         <div className="tn-logo__text-wrapper">
-                          <div className="tn-logo__text-line-1">Viện phát triển kinh tế hợp tác</div>
+                          <div className="tn-logo__text-line-1">T_Phim</div>
                           <div className="tn-logo__text-line-2"></div>
                         </div>
                       </div>
@@ -87,7 +93,7 @@ function Login(props) {
                     <form method="" action="" className="tn-form-container" >
                       <div className="form-group md-focus tn-form-control">
                         <div className="tn-form-control__icon icon-account-outline"><i className="fas fa-user"></i></div>
-                        <input id="username" autofocus="" type="text" className="form-control frmcust tn-form-control__input"
+                        <input id="username" autoFocus="" type="text" className="form-control frmcust tn-form-control__input"
                           placeholder="Tên đăng nhập" value={email} onChange={(e) => onChangeEmail(e.target.value)} />
                       </div>
                       <div className="form-group md-focus tn-form-control">

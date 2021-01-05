@@ -1,4 +1,4 @@
-export const api_url = "http://localhost:3003/api/"
+export const api_url = "http://localhost:8081/"
 export const rootImage = "D://Project3/dating_with_my_dog/media/assets/"
 
 export const instagram = {

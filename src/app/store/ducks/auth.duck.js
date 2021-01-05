@@ -84,13 +84,19 @@ export function* saga() {
     yield put(actions.requestUser());
   });
 
-  // yield takeLatest(actionTypes.UserRequested, function* userRequested(data) {
-  //   const { data: user } = yield getUserByToken(data.payload.user);
-  //   if (user.signal) {
-  //     yield put(actions.fulfillUser(user.data));
-  //   } else {
-  //     yield put(actions.logout());
-  //   }
-  // });
+  yield takeLatest(actionTypes.UserRequested, function* userRequested(data) {
+    // const { data: user } = yield getUserByToken(data.payload.user);
+    // if (user.signal) {
+    const user = {
+      data: {
+        id: "3b57945d-db28-4f28-af12-15706c00ab24",
+        username: "admin1",
+        role: "admin"
+      }
+    }
+    yield put(actions.fulfillUser(user.data));
+    // } else {
+    // yield put(actions.logout());
+    // }
+  });
 }
- 

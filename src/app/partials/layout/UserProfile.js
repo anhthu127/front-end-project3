@@ -19,7 +19,7 @@ class UserProfile extends React.Component {
           id="dropdown-toggle-user-profile"
         >
           <div className="kt-header__topbar-user">
-            {showHi  && (
+            {showHi && (
               <span className="kt-header__topbar-welcome kt-hidden-mobile">
                 Xin chào,
               </span>
@@ -27,7 +27,7 @@ class UserProfile extends React.Component {
 
             {showHi && (
               <span className="kt-header__topbar-username kt-hidden-mobile">
-                {user && user.name || 'unknow'}
+                {user && user.name || 'admin1'}
               </span>
             )}
 
@@ -46,7 +46,7 @@ class UserProfile extends React.Component {
             </div>
           </div>
           <div className="kt-notification">
-            <Link className="kt-notification__item" to="/">
+            <Link className="kt-notification__item" to="/use-profile">
               <div className="kt-notification__item-icon">
                 <i className="flaticon2-calendar-3 kt-font-success" />
               </div>
@@ -64,7 +64,7 @@ class UserProfile extends React.Component {
                 to="/logout"
                 className="btn btn-label-brand btn-sm btn-bold"
               >
-                Thoát
+                Đăng xuất
               </Link>
             </div>
           </div>
