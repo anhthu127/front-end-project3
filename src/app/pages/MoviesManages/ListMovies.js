@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import makeRequest from '../../Utils/MakeRequest';
 import { Table, Input, Button, FormGroup } from 'reactstrap'
 import Selector from '../../Utils/Selector'
-// import ReactPlayer from 'react-player'
 import { Pagination } from 'antd';
 import MakeRequest from '../../Utils/MakeRequest';
 import { Image } from 'react-bootstrap';
@@ -10,7 +9,8 @@ import { DiffOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import ModalConfirm from '../../Utils/ModalConfirm';
 import { showErrorMessage, showSuccessMessage, showSuccessMessageIcon } from '../../Utils/notification';
 import ModalDetail from './ModalDetail';
-export default function ListMovies() {
+import { defaultImage, media_url } from '../../Utils/constants'
+export default function ListMovies(props) {
 
     const [category, setCategory] = useState([]);
     const [listMovie, setListMovie] = useState([]);
@@ -19,7 +19,7 @@ export default function ListMovies() {
     const [total, setTotal] = useState(0)
     const [page, setPage] = useState(1)
     useEffect(() => {
-        getListCategory()
+        // getListCategory()
         getList()
     }, [])
 
@@ -35,11 +35,12 @@ export default function ListMovies() {
             page: page,
             limit: 10
         }
-        const res = await MakeRequest('GET', '/movies/list', data)
+        const res = await MakeRequest('GET', 'movie/all', data)
         if (res.data.signal === 1) {
+            console.log(res.data);
             const data = res.data.data
-            setTotal(data.count)
-            setListMovie(data.rows)
+            setTotal(data.pagination.totalRecords)
+            setListMovie(data.data)
         }
     }
     const getData = async (value) => {
@@ -67,7 +68,7 @@ export default function ListMovies() {
             page: pageNum,
             limit: 10
         }
-        const res = await MakeRequest('GET', '/movies/list', data)
+        const res = await MakeRequest('GET', 'movie/all', data)
         if (res.data.signal === 1) {
             const data = res.data.data
             setTotal(data.count)
@@ -77,7 +78,6 @@ export default function ListMovies() {
     const handleSort = (e) => {
         const code = e.target.value
         getData(code)
-
     }
 
     const handleDetails = () => {
@@ -86,16 +86,30 @@ export default function ListMovies() {
     const handleEdit = () => {
 
     }
+    const handleSearch = async (e) => {
+        const data = {
+            page: page,
+            limit: 10
+        }
+        const { value, name } = e.target
+        const res = await makeRequest('get', 'movie/all?searchData=' + value, data)
+        console.log(res.data.data.data);
+        if (res.data.signal === 1) {
+            const data = res.data.data
+            setTotal(data.totalPage)
+            setListMovie(data.data)
+        }
+    }
     const handleDelete = async (value) => {
         console.log(value);
-        const res = await makeRequest("POST", "/movies/del", value)
+        const res = await makeRequest("POST", "movies/del", value)
         if (res.data.signal === 1) {
             showSuccessMessageIcon("Xóa thành công")
             const data = {
                 page: page,
                 limit: 10
             }
-            const list = await MakeRequest('GET', '/movies/list', data)
+            const list = await MakeRequest('GET', 'movie/all', data)
             if (list.data.signal === 1) {
                 const data = list.data.data
                 setTotal(data.count)
@@ -115,7 +129,7 @@ export default function ListMovies() {
                             id="exampleSearch"
                             placeholder="Tìm kiếm"
                             onChange={(e) => {
-                                // this.handleSearch(e)
+                                handleSearch(e)
                             }}
                         />
                         <Button>
@@ -132,7 +146,8 @@ export default function ListMovies() {
                                         <option name="price" value={item.code}>{item.name}</option>
                                     )
                                 })
-                            }                        </Input>
+                            }
+                        </Input>
                     </FormGroup>
 
                 </div>
@@ -158,19 +173,35 @@ export default function ListMovies() {
                                     <th  >{index + 1}</th>
                                     <td>{value.name}</td>
                                     <td>
-                                        <Image height={100} src={value.image} />
-                                    </td>
+
+                                        {value.image === null ? (<Image height={100} src={defaultImage} />
+                                        ) : (<Image height={100} src={media_url + value.image} />
+                                            )}                                    </td>
                                     <td>{value.author}</td>
                                     <td>{value.description}</td>
-                                    <td>{value.link}</td>
+                                    <td>{value.link_movie}</td>
                                     <td>
                                         <div>
-                                            <ModalDetail
-                                                data={value}
-                                                handleOk={(value) => {
-                                                    editMovie(value)
-                                                }}
-                                            />
+                                            {value.link_movie === null ? (
+                                                <DiffOutlined style={{ paddingLeft: '20px', width: "50px", height: "30px", fontSize: '25px', color: 'blueviolet' }}
+                                                    type="primary" onClick={() => {
+                                                        props.history.push({
+                                                            pathname: '/admin/movie/series/detail/',
+                                                            search: '?id=' + value.id,
+                                                            state: { id: value.id }
+                                                        })
+                                                    }}>
+                                                </DiffOutlined>
+
+                                            ) : (
+                                                    <ModalDetail
+                                                        data={value}
+                                                        handleOk={(value) => {
+                                                            editMovie(value)
+                                                        }}
+                                                    />
+                                                )}
+
 
                                             {/* <EditOutlined style={{
                                                 paddingLeft: '20px', width: "50px",

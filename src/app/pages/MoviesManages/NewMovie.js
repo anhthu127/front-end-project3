@@ -21,42 +21,35 @@ export default function NewMovies() {
     const [file, setFile] = useState('')
     const [pathFile, setPath] = useState('')
     const [movieInfo, setInfor] = useState({
-        nameMovie: '',
+        name: '',
         description: '',
-        author: '',
-        linkMovie: '',
+        link_movie: '',
         category: '',
         listCharacter: ''
     })
     const [characterDel, setCharacterDel] = useState([])
     const [clear, setClear] = useState(false)
     const [isLoading, setLoading] = useState(false)
-    const [listCharacter, setListCharacter] = useState([])
+    const [director, setListDirector] = useState([])
     const [categories, setCategories] = useState({
         name: '',
         category_code: ''
     })
     const clearState = async () => {
         setInfor({
-            nameMovie: '',
+            name: '',
             description: '',
-            author: '',
-            linkMovie: '',
             category: '',
             listCharacter: ''
         })
 
-        const res = await makeRequest('GET', 'category/all')
-        const character = await makeRequest('GET', 'character/getAll')
+        const director = await makeRequest('GET', 'director/all')
+        if (director.data.signal === 1) {
 
-        if (res.data.signal === 1) {
-            const data = res.data.data
-            setCategories(data)
+            const data = director.data.data.data
+            setListDirector(data)
         }
-        if (character.data.signal === 1) {
-            const data = character.data.data
-            setListCharacter(data)
-        }
+
         setFile('')
         setPath('')
         setLoading(false)
@@ -66,108 +59,104 @@ export default function NewMovies() {
         setClear(false)
     }, [clear])
     useEffect(() => {
-
         async function fetchCategory() {
-            const res = await makeRequest('GET', 'category/all')
-            const character = await makeRequest('GET', 'character/getAll')
-            if (res.data.signal === 1) {
-                const data = res.data.data
-                setCategories(data)
-            }
-            if (character.data.signal === 1) {
-                console.log(character.data.data);
-                const data = character.data.data
-                setListCharacter(data)
+            // const res = await makeRequest('GET', 'category/all')
+            const direactor = await makeRequest('GET', 'director/all')
+            // if (res.data.signal === 1) {
+            //     const data = res.data.data
+            //     setCategories(data)
+            // }
+            if (direactor.data.signal === 1) {
+                console.log(direactor.data.data);
+                const data = direactor.data.data.data
+                setListDirector(data)
             }
         }
         fetchCategory()
-        console.log(listCharacter);
     }, [])
+    const saveImage = async (dataPost) => {
+        const res = await MakeRequest('post', `upload/photo`, dataPost
+            , {
+                'Content-Type': 'multipart/form-data'
+            }
+        )
+        if (res.data && res.data.signal === 1) {
+            return res.data
 
+        } else {
+            showErrorMessage('Tạo thất bạii')
+            setLoading(false)
+        }
+    }
     const submitHandle = async () => {
         setLoading(true)
-        console.log("movieInfor: " + JSON.stringify(movieInfo));
+        // console.log("movieInfor: " + JSON.stringify(movieInfo));
         let dataPost = new FormData();
-        dataPost.append('file', file);
+        dataPost.append('image', file);
         let image = null
-        image = await saveImage(dataPost)
-        if (image.data.signal === 1) {
-            if (movieInfo.nameMovie.length < 3 || movieInfo.description.length < 3 || movieInfo.linkMovie.length < 3
-                || movieInfo.author.length < 3
-                // || movieInfo.category.length < 1
-            ) {
+        if (file.length < 3) {
+            showErrorMessage("Cần thêm ảnh phim")
+        } else {
+            image = await saveImage(dataPost)
+            console.log(image);
+
+        }
+        if (image && image.signal === 1) {
+            console.log(movieInfo);
+            if (movieInfo.name.length > 3 || movieInfo.description.length > 3 || movieInfo.link_movie.length > 3) {
                 const dataMovie = {
-                    id: movieInfo.id,
                     name: movieInfo.name,
                     description: movieInfo.description,
-                    derectorId: movieInfo.derectorId,
+                    directorId: movieInfo.derectorId,
+                    linkMovie: movieInfo.link_movie,
                     image: image.data.imagePath
                 }
                 console.log(dataMovie);
+                const movie = await saveMovie(dataMovie)
+                setTimeout(() => {
+                    setLoading(false)
+                }, 500)
+            } else {
                 showErrorMessage("Điền đầy đủ thông tin")
-                setTimeout(() => {
-                    setLoading(false)
-                }, 500)
-            } else {
-
-            }
-        }
-        const saveImage = async (dataPost) => {
-            const res = await MakeRequest('post', `upload/photo`, dataPost
-                , {
-                    'Content-Type': 'multipart/form-data'
-                }
-            )
-            if (res.data && res.data.signal === 1) {
-                return res.data
-
-            } else {
-                showErrorMessage('Tạo thất bạii')
-                setLoading(false)
-            }
-        }
-        const saveMovie = async (dataPost) => {
-            const addResponse = await makeRequest('post', 'movies/create', dataPost
-                , {
-                    'Content-Type': 'multipart/form-data'
-                })
-            if (addResponse.data.signal === 1 && addResponse.data.code === 200) {
-                setTimeout(() => {
-                    setLoading(false)
-                }, 500)
-                showSuccessMessage("Tạo phim mới thành công")
-                clearState()
-            } else {
-                setTimeout(() => {
-                    setLoading(false)
-                }, 500)
-                showSuccessMessage("" + addResponse.data.message)
             }
         }
     }
+
+    const saveMovie = async (dataPost) => {
+        const addResponse = await makeRequest('post', 'movie/create', dataPost
+        )
+        if (addResponse.data.signal === 1) {
+            setTimeout(() => {
+                setLoading(false)
+            }, 500)
+            showSuccessMessage("Tạo phim mới thành công")
+            clearState()
+        } else {
+            setTimeout(() => {
+                setLoading(false)
+            }, 500)
+            showSuccessMessage("" + addResponse.data.message)
+        }
+    }
+
     const handleFile = (e) => {
         const url = e.target.files[0]
         setFile(e.target.files[0])
         var path = (window.URL || window.webkitURL).createObjectURL(url)
         setPath(path)
     }
-    const getCategory = (value) => {
+    const getDirector = (value) => {
         console.log("value   ", value);
         setInfor({
             ...movieInfo,
-            category: value
+            direactorId: value
         })
     }
-    const getCharacter = (value) => {
-        console.log("value   ", value);
-        setInfor({
-            ...movieInfo,
-            listCharacter: value
-        })
-    }
+
     const handleChange = e => {
         e.preventDefault();
         const { name, value } = e.target;
+        console.log(name + "==>" + value);
         setInfor({
             ...movieInfo,
             [name]: value,
@@ -184,11 +173,11 @@ export default function NewMovies() {
             <FormGroup>
                 <FormGroup className="wrap-movies-name">
                     <label className="label-in-new-movies">Tên phim</label>
-                    <Input id="custom-input-movie-name" name="nameMovie" value={movieInfo.nameMovie} onChange={handleChange}></Input>
+                    <Input id="custom-input-movie-name" name="name" value={movieInfo.name} onChange={handleChange}></Input>
                 </FormGroup>
                 <FormGroup className="wrap-movies-link">
                     <label className="label-in-new-movies"> Link phim </label>
-                    <Input name="linkMovie" id="custom-input-link-phim" value={movieInfo.linkMovie} onChange={handleChange}></Input>
+                    <Input name="link_movie" id="custom-input-link-phim" value={movieInfo.link_movie} onChange={handleChange}></Input>
                 </FormGroup>
 
                 <FormGroup className="wrap-movies-description">
@@ -230,8 +219,9 @@ export default function NewMovies() {
 
                 <FormGroup className="">
                     <label className="label-in-new-movies"> Đạo diễn</label>
-                    <Input name='author' id="custom-input-infor-author" value={movieInfo.author} onChange={handleChange} ></Input>
-                </FormGroup>
+                    <Selector placeholder="Chọn đạo diễn" data={director} multiple="none"
+                        name='category' getData={(value) => getDirector(value)}
+                    />                </FormGroup>
                 {/* 
                 <FormGroup className="wrap-movies-category">
                     <label className="label-in-new-movies"> Thể loại </label>

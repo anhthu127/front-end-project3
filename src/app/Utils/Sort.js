@@ -24,7 +24,7 @@ function Sort(props) {
         const res = await MakeRequest("GET", "character/search", searchData)
         if (res && res.data && res.data.signal === 1) {
             console.log(res.data.data);
-            props.updateListCharacter(res.data.data, res.data.pagination)
+            props.updateListCharacter(res.data.data.data, res.data.data.pagination)
         }
     }
     const handleSort = async (e) => {

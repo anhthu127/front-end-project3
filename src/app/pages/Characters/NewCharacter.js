@@ -87,7 +87,7 @@ export default function NewCharater() {
 
     }
     useEffect(() => {
-         console.log(characterInfo);
+        console.log(characterInfo);
     }, [characterInfo])
     const saveImage = async (dataPost) => {
         const res = await MakeRequest('post', `upload/photo`, dataPost

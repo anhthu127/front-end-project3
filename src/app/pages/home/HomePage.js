@@ -2,16 +2,18 @@
 import React, { Suspense, lazy } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import { LayoutSplashScreen } from "../../../_metronic";
- import ListChar from "../Characters/List";
+import ListChar from "../Characters/List";
 import NewCharater from "../Characters/NewCharacter";
+import ListDirector from "../Director/ListDirector";
+import DetailSeriesMovie from "../MoviesManages/DetailSeriesMovie";
 import Season from "../MoviesManages/Season";
-
+import SeriesMovie from "../MoviesManages/SeriesMovie";
 {
 	/* =============Dashboard============= */
 }
-const Dashboard = lazy(() => import("../dashboard/Dashboard"));
 const ListMovies = lazy(() => import('../MoviesManages/ListMovies'))
 const NewMovies = lazy(() => import('../MoviesManages/NewMovie'))
+const NewDirec = lazy(() => import('../Director/CreateDirector'))
 {
 	/* =============Error Page============= */
 }
@@ -25,37 +27,19 @@ export default function HomePage() {
 		<Suspense fallback={<LayoutSplashScreen />}>
 			<Switch>
 				{
-					/* Redirect from root URL to /dashboard. */
-					<Redirect exact from="/" to="/dashboard" />
+					<Redirect exact from="/" to="/admin" />
 				}
 				<Route path="/admin/movie/list" component={ListMovies} />
 				<Route path="/admin/movie/add" exact component={NewMovies} />
-				<Route   path="/admin/character/add" component={NewCharater} />
+				<Route path="/admin/character/add" component={NewCharater} />
 				<Route exact path="/admin/movie/season" component={Season} />
+				<Route path="/admin/movie/series/detail" component={DetailSeriesMovie} />
+				<Route exact path="/admin/movie/series/movie" component={SeriesMovie} />
 				<Route path="/admin/character/list" exact component={ListChar} />
-				{/* Route questions */}
-				{/* <Route path="/survey-sections/add" exact component={AddSurveySection} />
-				<Route
-					path="/survey-sections/update/:id"
-					component={EditSurveySection}
-				/>
-				<Route path="/survey-sections/list" component={ListSurveySection} /> */}
+				<Route exact path="/admin/director/add" component={NewDirec} />
+				<Route exact path="/admin/director/list" component={ListDirector} />
 
-				<Route path="/dashboard" component={Dashboard} />
-
-				{/* Route other */}
-				{/* <Route path="/formSurvey" component={FormSurvey} />
-				<Route path="/form/add" component={AddForm} />
-				<Route path="/showForm" component={ShowFormSurvey} />
-				<Route path="/form/list" component={ListForm} />
-				<Route path="/form/edit/:id" component={EditForm} /> */}
-				{/* <Route path="/answers" component={ListAnswers} /> */}
-				{/* <Route path="/report/table" component={FormReport} />
-				<Route path="/report/chart" component={ChartReport} /> */}
-
-				{/* <Redirect to="Error403" /> */}
 				<Route path="/Error403" component={Error403} />
-
 			</Switch>
 		</Suspense>
 	);

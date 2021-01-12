@@ -5,6 +5,7 @@ export const media_url = "http://phuquytuan123.com:3110/"
 
 export const rootImage = "D://Project3/dating_with_my_dog/media/assets/"
 
+export const defaultImage = './default.jpg'
 
 
 export const gender = {
