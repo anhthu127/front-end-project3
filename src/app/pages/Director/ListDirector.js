@@ -43,7 +43,7 @@ class ListDirector extends React.Component {
                 listData: res.data.data.data,
                 total: res.data.data.pagination.totalRecord,
             })
-        } else if (res.data.signal === 0 && res.data.message === "token invalid") {
+        } else if (res.data.signal === 0 && res.data.message === " Token invalid") {
             ValidToken(this.props)
         } else {
 

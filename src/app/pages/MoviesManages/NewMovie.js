@@ -1,19 +1,15 @@
-import { Button } from 'antd'
+import { Button, Radio } from 'antd'
 import { Alert, Input } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { rootImage } from '../../Utils/constants'
 import makeRequest from '../../Utils/MakeRequest'
 import { Form, FormGroup, FormText } from 'reactstrap';
 import Selector from '../../Utils/Selector'
-import { Col, Image } from 'react-bootstrap'
+import { Image } from 'react-bootstrap'
 import TextArea from 'antd/lib/input/TextArea'
-import { generateRandomCode } from '../../Utils/random'
-import { AddCircleOutline, RemoveCircleOutline } from '@material-ui/icons'
-import { Row } from 'react-bootstrap'
+
 import './NewMovies.css'
 import { showErrorMessage, showSuccessMessage } from '../../Utils/notification'
-import { forEach } from 'lodash'
-import AddMoreCharacter from './addMoreCharacter'
 import MakeRequest from '../../Utils/MakeRequest'
 
 
@@ -23,32 +19,33 @@ export default function NewMovies() {
     const [movieInfo, setInfor] = useState({
         name: '',
         description: '',
-        link_movie: '',
-        category: '',
-        listCharacter: ''
+        linkFilm: '',
+        category: [],
+        direactor: '',
+        linkTrailer: '',
+
     })
-    const [characterDel, setCharacterDel] = useState([])
+    const [typeMovie, setType] = useState('')
     const [clear, setClear] = useState(false)
     const [isLoading, setLoading] = useState(false)
-    const [director, setListDirector] = useState([])
+    const [director, setListDirector] = useState('')
     const [categories, setCategories] = useState({
         name: '',
         category_code: ''
     })
     const clearState = async () => {
-        setInfor({
-            name: '',
-            description: '',
-            category: '',
-            listCharacter: ''
-        })
+        setInfor(
+            {
+                name: '',
+                description: '',
+                linkFilm: '',
+                category: [],
+                direactor: '',
+                linkTrailer: '',
 
-        const director = await makeRequest('GET', 'director/all')
-        if (director.data.signal === 1) {
-
-            const data = director.data.data.data
-            setListDirector(data)
-        }
+            }
+        )
+        fetchCategory()
 
         setFile('')
         setPath('')
@@ -58,20 +55,20 @@ export default function NewMovies() {
         clearState()
         setClear(false)
     }, [clear])
-    useEffect(() => {
-        async function fetchCategory() {
-            // const res = await makeRequest('GET', 'category/all')
-            const direactor = await makeRequest('GET', 'director/all')
-            // if (res.data.signal === 1) {
-            //     const data = res.data.data
-            //     setCategories(data)
-            // }
-            if (direactor.data.signal === 1) {
-                console.log(direactor.data.data);
-                const data = direactor.data.data.data
-                setListDirector(data)
-            }
+    const fetchCategory = async () => {
+        const res = await makeRequest('GET', 'category/all')
+        const direactor = await makeRequest('GET', 'director/all')
+        if (res.data.signal === 1) {
+            const data = res.data.data
+            setCategories(data)
         }
+        if (direactor.data.signal === 1) {
+            console.log(direactor.data.data);
+            const data = direactor.data.data.data
+            setListDirector(data)
+        }
+    }
+    useEffect(() => {
         fetchCategory()
     }, [])
     const saveImage = async (dataPost) => {
@@ -88,68 +85,99 @@ export default function NewMovies() {
             setLoading(false)
         }
     }
+
+    const getCategory = async (value) => {
+        setInfor({
+            ...movieInfo,
+            category: value
+        })
+    }
+    const typeMovieSelected = (e) => {
+        setType(e.target.value)
+    }
     const submitHandle = async () => {
         setLoading(true)
-        // console.log("movieInfor: " + JSON.stringify(movieInfo));
         let dataPost = new FormData();
         dataPost.append('image', file);
         let image = null
-        if (file.length < 3) {
-            showErrorMessage("Cần thêm ảnh phim")
+        console.log(movieInfo);
+        console.log(movieInfo.category.length);
+        if (typeMovie.length > 0) {
+            if (movieInfo.name.length > 3 && movieInfo.category.length > 0 && movieInfo.description.length > 10
+                && movieInfo.linkFilm.length > 3 && movieInfo.linkTrailer.length > 3 && movieInfo?.directorId?.length > 20) {
+                console.log(movieInfo.category.length);
+                if (file.length < 3) {
+                    console.log(115);
+                    showErrorMessage("Cần thêm ảnh phim")
+                    setLoading(false)
+                } else {
+                    console.log(119);
+                    image = await saveImage(dataPost)
+                    console.log(image);
+                }
+            } else {
+                showErrorMessage("Điền đầy đủ thông tin")
+                setLoading(false)
+
+            }
         } else {
-            image = await saveImage(dataPost)
-            console.log(image);
+            showErrorMessage('Chọn phân loại phim muốn thêm')
+            setLoading(false)
 
         }
         if (image && image.signal === 1) {
-            console.log(movieInfo);
-            if (movieInfo.name.length > 3 || movieInfo.description.length > 3 || movieInfo.link_movie.length > 3) {
-                const dataMovie = {
-                    name: movieInfo.name,
-                    description: movieInfo.description,
-                    directorId: movieInfo.derectorId,
-                    linkMovie: movieInfo.link_movie,
-                    image: image.data.imagePath
-                }
-                console.log(dataMovie);
-                const movie = await saveMovie(dataMovie)
-                setTimeout(() => {
-                    setLoading(false)
-                }, 500)
-            } else {
-                showErrorMessage("Điền đầy đủ thông tin")
+            const dataMovie = {
+                name: movieInfo.name,
+                description: movieInfo.description,
+                directorId: movieInfo.directorId,
+                linkFilm: movieInfo.linkFilm,
+                image: image.data.imagePath,
+                category: movieInfo.category,
+                linkTrailer: movieInfo.linkTrailer
             }
+            console.log(dataMovie);
+            const movie = await saveMovie(dataMovie)
+            setTimeout(() => {
+                setLoading(false)
+            }, 500)
+        } else {
+            return 0
         }
     }
 
     const saveMovie = async (dataPost) => {
-        const addResponse = await makeRequest('post', 'movie/create', dataPost
-        )
-        if (addResponse.data.signal === 1) {
+        let addResponse = null
+        if (typeMovie === 'series') {
+            addResponse = await makeRequest('post', 'movie/create?movieType=series', dataPost)
+        }
+        else if (typeMovie === 'single') {
+            addResponse = await makeRequest('post', 'movie/create?movieType=single', dataPost)
+        }
+        if (addResponse?.data?.signal === 1) {
             setTimeout(() => {
                 setLoading(false)
             }, 500)
             showSuccessMessage("Tạo phim mới thành công")
-            clearState()
+            await clearState()
         } else {
             setTimeout(() => {
                 setLoading(false)
             }, 500)
-            showSuccessMessage("" + addResponse.data.message)
+            showErrorMessage("" + addResponse?.data?.message)
         }
     }
 
     const handleFile = (e) => {
         const url = e.target.files[0]
         setFile(e.target.files[0])
-        var path = (window.URL || window.webkitURL).createObjectURL(url)
+        var path = (window.URL && window.webkitURL).createObjectURL(url)
         setPath(path)
     }
     const getDirector = (value) => {
         console.log("value   ", value);
         setInfor({
             ...movieInfo,
-            direactorId: value
+            directorId: value
         })
     }
 
@@ -171,15 +199,24 @@ export default function NewMovies() {
     return (
         <div>
             <FormGroup>
+                <FormGroup className="wrap-type-movie-box" >
+                    <Radio.Group style={{ display: 'flex', width: '100%' }} onChange={typeMovieSelected} value={typeMovie}>
+                        <div style={{ width: '50%' }}>  <Radio value={'series'}>Phim bộ</Radio></div>
+                        <div style={{ width: '50%' }}> <Radio value={'single'}>Phim lẻ</Radio></div>
+                    </Radio.Group>
+                </FormGroup>
                 <FormGroup className="wrap-movies-name">
                     <label className="label-in-new-movies">Tên phim</label>
                     <Input id="custom-input-movie-name" name="name" value={movieInfo.name} onChange={handleChange}></Input>
                 </FormGroup>
                 <FormGroup className="wrap-movies-link">
                     <label className="label-in-new-movies"> Link phim </label>
-                    <Input name="link_movie" id="custom-input-link-phim" value={movieInfo.link_movie} onChange={handleChange}></Input>
+                    <Input name="linkFilm" id="custom-input-link-phim" value={movieInfo.linkFilm} onChange={handleChange}></Input>
                 </FormGroup>
-
+                <FormGroup className="wrap-movies-link">
+                    <label className="label-in-new-movies"> Link trailer </label>
+                    <Input name="linkTrailer" id="custom-input-link-phim" value={movieInfo.linkTrailer} onChange={handleChange}></Input>
+                </FormGroup>
                 <FormGroup className="wrap-movies-description">
                     <label className="label-in-new-movies">Miêu tả</label>
                     <TextArea id="custom-description-movie" name="description" value={movieInfo.description} onChange={handleChange}></TextArea>
@@ -208,28 +245,20 @@ export default function NewMovies() {
                             )}
                     </div>
                 </FormGroup>
-                {/*                 
-                <FormGroup className="wrap-unique-movies-box">
-                    <label className="label-in-new-movies" >Danh sách diễn viên</label>
-                    <Selector placeholder="Chọn danh sách diễn viên" data={listCharacter} multiple="multiple"
-                        name='category' getData={(value) => getCharacter(value)} />
-                    <AddMoreCharacter />
-                </FormGroup> */}
-
 
                 <FormGroup className="">
                     <label className="label-in-new-movies"> Đạo diễn</label>
                     <Selector placeholder="Chọn đạo diễn" data={director} multiple="none"
                         name='category' getData={(value) => getDirector(value)}
                     />                </FormGroup>
-                {/* 
+
                 <FormGroup className="wrap-movies-category">
                     <label className="label-in-new-movies"> Thể loại </label>
                     <Selector placeholder="Chọn thể loại phim" data={categories} multiple="multiple"
                         name='category' getData={(value) => getCategory(value)}
                     />
                 </FormGroup>
-            */}
+
             </FormGroup>
             <div>
 

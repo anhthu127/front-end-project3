@@ -41,7 +41,7 @@ function Season() {
     }
     async function fetchCategory() {
         const res = await MakeRequest('GET', 'category/all')
-        const character = await MakeRequest('GET', 'character/getAll')
+        const character = await MakeRequest('GET', 'character/all')
         if (res.data.signal === 1) {
             const data = res.data.data
             setCategories(data)
@@ -97,24 +97,6 @@ function Season() {
                             )}
                     </div>
                 </FormGroup>
-                {/*                 
-                <div>
-                    <FormGroup className="wrap-season">
-                        <label className="label-in-new-movies"> Chọn số mùa của phim</label>
-                        <Input name="season" id="custom-input-season"
-                            value={seasonInfo.season}
-                            type="number"
-                            onChange={handleChange}
-                        ></Input>
-                    </FormGroup>
-                    <FormGroup className="wrap-movies-category">
-                        <label className="label-in-new-movies"> Thể loại </label>
-                        <Selector placeholder="Chọn thể loại phim" data={categories} multiple="multiple"
-                            name='category' getData={(value) => getCategory(value)}
-                        />
-                    </FormGroup>
-                </div> */}
-
             </FormGroup>
         </div>
     )

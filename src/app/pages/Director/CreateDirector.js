@@ -56,7 +56,7 @@ function CreateDirector(props) {
             setLoading(false)
             showSuccessMessage("Tạo đạo diễn thành công")
         }
-        else if (res.data.signal === 0 && res.data.message === "token invalid") {
+        else if (res.data.signal === 0 && res.data.message === "Token invalid") {
             ValidToken(props)
         }
         else {

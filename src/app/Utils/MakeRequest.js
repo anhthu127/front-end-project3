@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { api_url } from './constants';
-import { token } from './constants';
-
+ 
 export default (method, url, params = {}, headers = "", responseType) => {
     method = method.toLowerCase();
     let token = localStorage.getItem("token");

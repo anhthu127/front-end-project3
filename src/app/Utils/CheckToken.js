@@ -3,5 +3,6 @@ import React from 'react'
 export const ValidToken = (props) => {
     localStorage.removeItem('token')
     localStorage.removeItem('role')
-    props.history.push('/auth')
+    console.log(props.history);
+    props.history.push('/logout')
 }

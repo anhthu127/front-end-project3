@@ -11,18 +11,29 @@ function SeriesMovie() {
     const [pathFile, setPath] = useState('')
     const [clear, setClear] = useState(false)
     const [isLoading, setLoading] = useState(false)
-
+    const [director, setListDirector] = useState([])
     const [SeriesMovieInfo, setInfor] = useState({
         name: '',
         description: '',
         seriesMovie: '',
-        listCharacter: ''
+        listCharacter: '',
+        category: [],
+
     })
     const [listCharacter, setListCharacter] = useState([])
     const [categories, setCategories] = useState({
         name: '',
         category_code: ''
     })
+    const getAllDirector = async () => {
+        const director = await MakeRequest('GET', 'director/all')
+        if (director.data.signal === 1) {
+
+            const data = director.data.data.data
+            setListDirector(data)
+        }
+
+    }
     const handleFile = (e) => {
         const url = e.target.files[0]
         setFile(e.target.files[0])
@@ -66,6 +77,7 @@ function SeriesMovie() {
             showSuccessMessage("" + addResponse.data.message)
         }
     }
+
     const handleCreateSeries = async () => {
         let dataPost = new FormData();
         dataPost.append('image', file);
@@ -84,8 +96,9 @@ function SeriesMovie() {
                 const dataMovie = {
                     name: SeriesMovieInfo.name,
                     description: SeriesMovieInfo.description,
-                    // directorId: SeriesMovieInfo.derectorId,
-                    // linkMovie: SeriesMovieInfo.link_movie,
+                    directorId: SeriesMovieInfo.directorId,
+                    linkMovie: SeriesMovieInfo.link_movie,
+                    category: SeriesMovieInfo.category,
                     image: image.data.imagePath
                 }
                 console.log(dataMovie);
@@ -112,12 +125,23 @@ function SeriesMovie() {
             setLoading(false)
         }
     }
-
-
+    const getCategory = async (value) => {
+        setInfor({
+            ...SeriesMovieInfo,
+            category: value
+        })
+    }
+    const getDirector = (value) => {
+        console.log("value   ", value);
+        setInfor({
+            ...SeriesMovieInfo,
+            directorId: value
+        })
+    }
 
     async function fetchCategory() {
         const res = await MakeRequest('GET', 'category/all')
-        const character = await MakeRequest('GET', 'character/getAll')
+        const character = await MakeRequest('GET', 'character/all')
         if (res.data.signal === 1) {
             const data = res.data.data
             setCategories(data)
@@ -130,6 +154,7 @@ function SeriesMovie() {
     }
     useEffect(() => {
         fetchCategory()
+        getAllDirector()
     }, [])
 
     return (
@@ -169,6 +194,18 @@ function SeriesMovie() {
                                 </>
                             )}
                     </div>
+                </FormGroup>
+
+                <FormGroup className="">
+                    <label className="label-in-new-movies"> Đạo diễn</label>
+                    <Selector placeholder="Chọn đạo diễn" data={director} multiple="none"
+                        name='category' getData={(value) => getDirector(value)}
+                    />                </FormGroup>
+                <FormGroup className="wrap-movies-category">
+                    <label className="label-in-new-movies"> Thể loại </label>
+                    <Selector placeholder="Chọn thể loại phim" data={categories} multiple="multiple"
+                        name='category' getData={(value) => getCategory(value)}
+                    />
                 </FormGroup>
                 <div >
                     <Button onClick={() => {

@@ -57,7 +57,7 @@ function UpdateDirector(props) {
         )
         if (res.data && res.data.signal === 1) {
             return res.data
-        } else if (res.data.signal === 0 && res.data.message === "token invalid") {
+        } else if (res.data.signal === 0 && res.data.message === "Token invalid") {
             ValidToken(props)
         }
     }
